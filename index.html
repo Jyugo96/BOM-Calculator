@@ -42,17 +42,17 @@ const R = (x,y,w,h,rx,k) => React.createElement("rect", { x,y,width:w,height:h,r
 
 const Trash2 = (p) => Icon({ ...p, children: [P("M3 6h18"), P("M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"), L(10,11,10,17,"a"), L(14,11,14,17,"b")] });
 const Upload = (p) => Icon({ ...p, children: [P("M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"), Poly("17 8 12 3 7 8","a"), L(12,3,12,15,"b")] });
-const FileJson = (p) => Icon({ ...p, children: [P("M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"), Poly("14 2 14 8 20 8","a"), P("M10 12a1 1 0 0 0-1 1v1a1 1 0 0 1-1 1 1 1 0 0 1 1 1v1a1 1 0 0 0 1 1"), P("M14 18a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1 1 1 0 0 1-1-1v-1a1 1 0 0 0-1-1")] });
-const FileSpreadsheet = (p) => Icon({ ...p, children: [P("M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"), Poly("14 2 14 8 20 8","a"), L(8,13,16,13,"b"), L(8,17,16,17,"c"), L(12,13,12,17,"d")] });
-const Package = (p) => Icon({ ...p, children: [P("M16.5 9.4 7.5 4.21"), P("M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"), Poly("3.27 6.96 12 12.01 20.73 6.96","a"), L(12,22,12,12,"b")] });
+const FileJson = (p) => Icon({ ...p, children: [P("M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"), Poly("14 2 14 8 20 8","a"), P("M10 12a1 1 0 0 0-1 1v1a1 1 0 0 1-1 1 1 1 0 0 1 1 1v1a1 1[...]
+const FileSpreadsheet = (p) => Icon({ ...p, children: [P("M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"), Poly("14 2 14 8 20 8","a"), L(8,13,16,13,"b"), L(8,17,16,17,"c"), L(12,13,12,17,[...]
+const Package = (p) => Icon({ ...p, children: [P("M16.5 9.4 7.5 4.21"), P("M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"), [...]
 const Search = (p) => Icon({ ...p, children: [C(11,11,8,"a"), P("M21 21l-4.3-4.3")] });
 const Edit3 = (p) => Icon({ ...p, children: [L(12,20,21,20,"a"), P("M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z")] });
 const Check = (p) => Icon({ ...p, children: [Poly("20 6 9 17 4 12","a")] });
 const ChevronDown = (p) => Icon({ ...p, children: [Poly("6 9 12 15 18 9","a")] });
 const ChevronRight = (p) => Icon({ ...p, children: [Poly("9 18 15 12 9 6","a")] });
-const Box = (p) => Icon({ ...p, children: [P("M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"), Poly("3.27 6.96 12 12.01 20.73 6.96","a"), L(12,22,12,12,"b")] });
-const Ruler = (p) => Icon({ ...p, children: [P("M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"), P("M14.5 12.5 12 15"), P("M11.5 9.5 9 12"), P("M8.5 6.5 6 9"), P("M17.5 15.5 15 18")] });
-const Layers = (p) => Icon({ ...p, children: [P("M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"), P("M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"), P("M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17")] });
+const Box = (p) => Icon({ ...p, children: [P("M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"), Poly("3.27 6.96 12 12.01 20.7[...]
+const Ruler = (p) => Icon({ ...p, children: [P("M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"), P("M14.5 12.5 12 15"), P("M1[...]
+const Layers = (p) => Icon({ ...p, children: [P("M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"), P("M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 [...]
 const AlertTriangle = (p) => Icon({ ...p, children: [P("M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"), L(12,9,12,13,"a"), L(12,17,12.01,17,"b")] });
 
 
@@ -295,7 +295,7 @@ function BOMManager() {
       `# BuildQty: ${buildQty}  Kerf: ${kerf}`,
       header.join(","),
       ...rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")),
-      `,,,,,,,,,Unit cost: ${totals.unitCost.toFixed(2)},,Build purchase: ${totals.purchaseCost.toFixed(2)}`,
+      `,,,,,,,,,Unit cost: Rp${fmt(totals.unitCost)},,Build purchase: Rp${fmt(totals.purchaseCost)}`,
       ...groupLines,
     ].join("\n");
     download(csv, `${slug(productName)}-bom.csv`, "text/csv");
@@ -462,8 +462,8 @@ function BOMManager() {
         </div>
 
         <div style={styles.statsGrid}>
-          <Stat label="Cost / Product" value={`$${fmt(totals.unitCost)}`} accent />
-          <Stat label={`Buy for ${totals.buildQty}`} value={`$${fmt(totals.purchaseCost)}`} />
+          <Stat label="Cost / Product" value={`Rp${fmt(totals.unitCost)}`} accent />
+          <Stat label={`Buy for ${totals.buildQty}`} value={`Rp${fmt(totals.purchaseCost)}`} />
           <Stat label="Line Items" value={totals.lineItems} />
           <Stat label="Stock Profiles" value={totals.stockProfiles} />
         </div>
@@ -519,8 +519,8 @@ function BOMManager() {
                       onChange={(e) => updatePart(part.id, "qty", e.target.value)}
                       title={isStock ? "Cuts per product" : "Quantity per product"}
                       style={{ ...styles.cellInput, flex: "0 0 70px", textAlign: "right" }} min="0" />
-                    <div style={{ ...styles.lineTotal, flex: "0 0 120px" }}>${fmt(c.usedCostPerProduct)}</div>
-                    <div style={{ ...styles.buyTotal, flex: "0 0 130px" }}>${fmt(c.allocBuild)}</div>
+                    <div style={{ ...styles.lineTotal, flex: "0 0 120px" }}>Rp{fmt(c.usedCostPerProduct)}</div>
+                    <div style={{ ...styles.buyTotal, flex: "0 0 130px" }}>Rp{fmt(c.allocBuild)}</div>
                     <button className="del-btn" style={styles.delBtn} onClick={() => removePart(part.id)} title="Remove"><Trash2 size={15} /></button>
                   </div>
 
@@ -555,14 +555,14 @@ function BOMManager() {
                         </DetailField>
                       </div>
                       <div style={styles.partCalc}>
-                        <Calc label="Price / unit length" value={`$${fmt(c.perMeter, 3)}/${part.unit}`} />
+                        <Calc label="Price / unit length" value={`Rp${fmt(c.perMeter, 3)}/${part.unit}`} />
                         <Calc label="Used per product" value={`${fmt(c.consumedPerProduct, 3)} ${part.unit}`} />
-                        <Calc label="Material cost / product" value={`$${fmt(c.usedCostPerProduct)}`} />
-                        <Calc label="Share of shared sticks" value={`$${fmt(c.allocBuild)}`} highlight />
+                        <Calc label="Material cost / product" value={`Rp${fmt(c.usedCostPerProduct)}`} />
+                        <Calc label="Share of shared sticks" value={`Rp${fmt(c.allocBuild)}`} highlight />
                       </div>
                       {!part.profile && (
                         <div style={styles.hintBanner}>
-                          No profile code — this part nests on its own. Give two parts the same code (e.g. “SHS-25”) to share sticks and reuse drops between them.
+                          No profile code — this part nests on its own. Give two parts the same code (e.g. "SHS-25") to share sticks and reuse drops between them.
                         </div>
                       )}
                     </div>
@@ -577,11 +577,11 @@ function BOMManager() {
             <div style={styles.footTotals}>
               <div style={styles.footBlock}>
                 <span style={styles.footLabel}>COST / PRODUCT</span>
-                <span style={styles.footValueSm}>${fmt(totals.unitCost)}</span>
+                <span style={styles.footValueSm}>Rp{fmt(totals.unitCost)}</span>
               </div>
               <div style={styles.footBlock}>
                 <span style={styles.footLabel}>PURCHASE FOR {totals.buildQty}</span>
-                <span style={styles.footValue}>${fmt(totals.purchaseCost)}</span>
+                <span style={styles.footValue}>Rp{fmt(totals.purchaseCost)}</span>
               </div>
             </div>
           </div>
@@ -604,7 +604,7 @@ function BOMManager() {
                       <div>
                         <div style={styles.groupCode}>{g.label || "(no code — solo)"}</div>
                         <div style={styles.groupSub}>
-                          {g.parts.length} part{g.parts.length > 1 ? "s" : ""} · {g.stockLength} {g.unit} sticks @ ${fmt(g.stockPrice)}
+                          {g.parts.length} part{g.parts.length > 1 ? "s" : ""} · {g.stockLength} {g.unit} sticks @ Rp{fmt(g.stockPrice)}
                         </div>
                       </div>
                       <div style={styles.groupSticks}>
@@ -620,7 +620,7 @@ function BOMManager() {
                     ) : (
                       <>
                         <div style={styles.groupStats}>
-                          <GroupStat label="Purchase" value={`$${fmt(g.purchaseCost)}`} />
+                          <GroupStat label="Purchase" value={`Rp${fmt(g.purchaseCost)}`} />
                           <GroupStat label="Material used" value={`${fmt(g.nest.totalCutLen, 2)} ${g.unit}`} />
                           <GroupStat label="Reusable drop" value={`${fmt(g.nest.usableDrop, 2)} ${g.unit}`} good />
                           <GroupStat label="Scrap" value={`${fmt(g.nest.scrap, 2)} ${g.unit}`} warn />
@@ -637,7 +637,7 @@ function BOMManager() {
                               <span style={styles.groupPartName}>
                                 {p.partNumber || p.name || "—"} · {num(p.cutLength)}{g.unit} × {Math.round(num(p.qty) * totals.buildQty)}
                               </span>
-                              <span style={styles.groupPartCost}>${fmt(g.perPartCost[p.id] || 0)}</span>
+                              <span style={styles.groupPartCost}>Rp{fmt(g.perPartCost[p.id] || 0)}</span>
                             </div>
                           ))}
                         </div>
@@ -654,7 +654,7 @@ function BOMManager() {
           Stock parts that share a <b style={{ color: "var(--accent2)" }}>profile code</b> are nested into one shared pool of
           sticks using a longest-first (first-fit-decreasing) cut plan, so a short cut drops into the leftover from a long
           cut instead of opening a new stick. The <b style={{ color: "var(--accent)" }}>cost / product</b> still charges only
-          the length each part consumes; <b style={{ color: "var(--accent2)" }}>share of buy</b> splits each group’s real
+          the length each part consumes; <b style={{ color: "var(--accent2)" }}>share of buy</b> splits each group's real
           stick cost across its parts by length. Reusable drop is leftover long enough for another cut; scrap is too short.
           Set kerf for blade width. Export to save; import to reload.
         </footer>
@@ -735,22 +735,22 @@ const styles = {
   container: { position: "relative", maxWidth: 1000, margin: "0 auto", padding: "36px 24px 60px" },
   header: { display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16, marginBottom: 32 },
   brandRow: { display: "flex", alignItems: "center", gap: 14 },
-  logoMark: { width: 44, height: 44, borderRadius: 10, background: "linear-gradient(135deg,var(--accent),#ff5e3a)", display: "flex", alignItems: "center", justifyContent: "center", color: "#0d1117", boxShadow: "0 4px 20px rgba(255,140,66,0.3)" },
+  logoMark: { width: 44, height: 44, borderRadius: 10, background: "linear-gradient(135deg,var(--accent),#ff5e3a)", display: "flex", alignItems: "center", justifyContent: "center", color: "#0d1117", b[...]
   kicker: { fontFamily: "var(--mono)", fontSize: 10, letterSpacing: 3, color: "var(--accent2)", marginBottom: 2 },
   brandName: { fontSize: 22, fontWeight: 700, letterSpacing: -0.5 },
   actions: { display: "flex", gap: 8, flexWrap: "wrap" },
-  ghostBtn: { display: "flex", alignItems: "center", gap: 6, background: "var(--panel)", border: "1px solid var(--line)", color: "var(--text)", padding: "9px 14px", borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "var(--sans)", transition: "all 0.15s" },
+  ghostBtn: { display: "flex", alignItems: "center", gap: 6, background: "var(--panel)", border: "1px solid var(--line)", color: "var(--text)", padding: "9px 14px", borderRadius: 8, fontSize: 13, font[...]
   titleBlock: { marginBottom: 22 },
   titleLabel: { fontFamily: "var(--mono)", fontSize: 11, letterSpacing: 2, color: "var(--muted)" },
   titleDisplay: { display: "flex", alignItems: "center", gap: 12, cursor: "pointer", marginTop: 4 },
   title: { fontSize: 34, fontWeight: 700, letterSpacing: -1, margin: 0 },
   titleEditRow: { display: "flex", alignItems: "center", gap: 10, marginTop: 4 },
-  titleInput: { fontSize: 34, fontWeight: 700, letterSpacing: -1, background: "transparent", border: "none", borderBottom: "2px solid var(--accent)", color: "var(--text)", outline: "none", fontFamily: "var(--sans)", padding: "0 0 4px", width: "100%", maxWidth: 500 },
-  iconConfirm: { background: "var(--accent)", border: "none", color: "#0d1117", width: 36, height: 36, borderRadius: 8, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" },
-  buildBar: { display: "flex", alignItems: "center", gap: 0, background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 12, padding: "6px 8px", marginBottom: 20, width: "fit-content" },
+  titleInput: { fontSize: 34, fontWeight: 700, letterSpacing: -1, background: "transparent", border: "none", borderBottom: "2px solid var(--accent)", color: "var(--text)", outline: "none", fontFamily:[...]
+  iconConfirm: { background: "var(--accent)", border: "none", color: "#0d1117", width: 36, height: 36, borderRadius: 8, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "cente[...]
+  buildBar: { display: "flex", alignItems: "center", gap: 0, background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 12, padding: "6px 8px", marginBottom: 20, width: "fit-content" }[...]
   buildField: { display: "flex", alignItems: "center", gap: 10, padding: "8px 16px" },
   buildLabel: { fontFamily: "var(--mono)", fontSize: 10.5, letterSpacing: 1.5, color: "var(--muted)" },
-  buildInput: { width: 64, background: "var(--panel2)", border: "1px solid var(--line)", borderRadius: 6, color: "var(--text)", padding: "7px 8px", fontSize: 15, fontWeight: 600, outline: "none", fontFamily: "var(--mono)", textAlign: "right" },
+  buildInput: { width: 64, background: "var(--panel2)", border: "1px solid var(--line)", borderRadius: 6, color: "var(--text)", padding: "7px 8px", fontSize: 15, fontWeight: 600, outline: "none", font[...]
   buildHint: { fontSize: 12, color: "var(--muted)" },
   buildDivider: { width: 1, alignSelf: "stretch", background: "var(--line)", margin: "6px 0" },
   statsGrid: { display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 24 },
@@ -761,32 +761,32 @@ const styles = {
   toolbar: { display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap" },
   searchWrap: { display: "flex", alignItems: "center", gap: 10, background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 8, padding: "0 14px", flex: 1, minWidth: 180 },
   searchInput: { background: "transparent", border: "none", color: "var(--text)", outline: "none", padding: "11px 0", fontSize: 14, flex: 1, fontFamily: "var(--sans)" },
-  addBtnAlt: { display: "flex", alignItems: "center", gap: 7, background: "var(--panel)", border: "1px solid var(--line)", color: "var(--text)", padding: "11px 18px", borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "var(--sans)", transition: "all 0.15s" },
-  addBtn: { display: "flex", alignItems: "center", gap: 7, background: "var(--accent2)", border: "none", color: "#08302b", padding: "11px 20px", borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "var(--sans)", boxShadow: "0 4px 16px rgba(79,209,197,0.25)", transition: "all 0.15s" },
+  addBtnAlt: { display: "flex", alignItems: "center", gap: 7, background: "var(--panel)", border: "1px solid var(--line)", color: "var(--text)", padding: "11px 18px", borderRadius: 8, fontSize: 14, fo[...]
+  addBtn: { display: "flex", alignItems: "center", gap: 7, background: "var(--accent2)", border: "none", color: "#08302b", padding: "11px 20px", borderRadius: 8, fontSize: 14, fontWeight: 600, cursor:[...]
   tableCard: { background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, overflow: "hidden" },
   tableHead: { display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", borderBottom: "1px solid var(--line)", background: "var(--panel2)" },
   th: { fontFamily: "var(--mono)", fontSize: 10.5, letterSpacing: 1.2, color: "var(--muted)", fontWeight: 600 },
   row: { display: "flex", alignItems: "center", gap: 12, padding: "8px 18px", borderBottom: "1px solid rgba(45,53,67,0.5)" },
   expBtn: { background: "transparent", border: "none", color: "var(--muted)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0 },
   discDot: { width: 7, height: 7, borderRadius: "50%", background: "var(--accent)", opacity: 0.6, display: "block" },
-  cellInput: { background: "transparent", border: "1px solid transparent", borderRadius: 6, color: "var(--text)", padding: "8px 10px", fontSize: 14, outline: "none", fontFamily: "var(--sans)", transition: "all 0.15s", minWidth: 0 },
-  profileTag: { fontSize: 10.5, fontFamily: "var(--mono)", background: "rgba(79,209,197,0.14)", color: "var(--accent2)", padding: "3px 8px", borderRadius: 5, letterSpacing: 0.5, whiteSpace: "nowrap", flexShrink: 0 },
+  cellInput: { background: "transparent", border: "1px solid transparent", borderRadius: 6, color: "var(--text)", padding: "8px 10px", fontSize: 14, outline: "none", fontFamily: "var(--sans)", transit[...]
+  profileTag: { fontSize: 10.5, fontFamily: "var(--mono)", background: "rgba(79,209,197,0.14)", color: "var(--accent2)", padding: "3px 8px", borderRadius: 5, letterSpacing: 0.5, whiteSpace: "nowrap", [...]
   lineTotal: { textAlign: "right", fontFamily: "var(--mono)", fontSize: 14, fontWeight: 600, color: "var(--accent)" },
   buyTotal: { textAlign: "right", fontFamily: "var(--mono)", fontSize: 14, fontWeight: 600, color: "var(--accent2)" },
-  delBtn: { flex: "0 0 36px", background: "transparent", border: "none", color: "var(--muted)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 8, borderRadius: 6, transition: "all 0.15s" },
+  delBtn: { flex: "0 0 36px", background: "transparent", border: "none", color: "var(--muted)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 8, borderRa[...]
   detail: { padding: "4px 18px 20px 54px", background: "rgba(28,34,48,0.35)", borderBottom: "1px solid rgba(45,53,67,0.5)" },
   detailGrid: { display: "flex", gap: 14, flexWrap: "wrap", marginBottom: 14, paddingTop: 12, alignItems: "flex-end" },
   detailField: { display: "flex", flexDirection: "column", gap: 5 },
   detailLabel: { fontFamily: "var(--mono)", fontSize: 10, letterSpacing: 1, color: "var(--muted)" },
-  detailInput: { width: 120, background: "var(--panel2)", border: "1px solid var(--line)", borderRadius: 6, color: "var(--text)", padding: "8px 10px", fontSize: 14, outline: "none", fontFamily: "var(--mono)" },
+  detailInput: { width: 120, background: "var(--panel2)", border: "1px solid var(--line)", borderRadius: 6, color: "var(--text)", padding: "8px 10px", fontSize: 14, outline: "none", fontFamily: "var(-[...]
   partCalc: { display: "flex", flexWrap: "wrap", gap: 0, background: "var(--bg)", border: "1px solid var(--line)", borderRadius: 10, overflow: "hidden" },
   calcItem: { flex: "1 1 140px", padding: "12px 14px", borderRight: "1px solid var(--line)", minWidth: 130 },
   calcLabel: { fontFamily: "var(--mono)", fontSize: 9.5, letterSpacing: 0.8, color: "var(--muted)", marginBottom: 6 },
   calcValue: { fontFamily: "var(--mono)", fontSize: 15, fontWeight: 600 },
-  hintBanner: { marginTop: 10, padding: "9px 13px", background: "rgba(79,209,197,0.08)", border: "1px solid rgba(79,209,197,0.25)", borderRadius: 8, color: "var(--accent2)", fontSize: 12, lineHeight: 1.5 },
-  warnBanner: { marginTop: 10, padding: "10px 14px", background: "rgba(224,166,79,0.12)", border: "1px solid rgba(224,166,79,0.35)", borderRadius: 8, color: "#e0a64f", fontSize: 12.5, lineHeight: 1.5, display: "flex", alignItems: "center", gap: 8 },
+  hintBanner: { marginTop: 10, padding: "9px 13px", background: "rgba(79,209,197,0.08)", border: "1px solid rgba(79,209,197,0.25)", borderRadius: 8, color: "var(--accent2)", fontSize: 12, lineHeight: [...]
+  warnBanner: { marginTop: 10, padding: "10px 14px", background: "rgba(224,166,79,0.12)", border: "1px solid rgba(224,166,79,0.35)", borderRadius: 8, color: "#e0a64f", fontSize: 12.5, lineHeight: 1.5,[...]
   empty: { padding: "48px 20px", textAlign: "center", color: "var(--muted)", fontSize: 14 },
-  tableFoot: { display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16, padding: "18px 20px", background: "var(--panel2)", borderTop: "1px solid var(--line)" },
+  tableFoot: { display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16, padding: "18px 20px", background: "var(--panel2)", borderTop: "1px solid var(--line)" [...]
   footMeta: { fontFamily: "var(--mono)", fontSize: 12, letterSpacing: 0.5, color: "var(--muted)" },
   footTotals: { display: "flex", gap: 28, alignItems: "flex-end" },
   footBlock: { display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2 },
