@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Forge BOM — Bill of Materials</title>
+<meta name="description" content="Forge BOM: build and cost bills of materials with stock-material nesting." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #0d1117; }
+  #root { min-height: 100vh; }
+  #boot {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    color: #4fd1c5; font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 2px;
+  }
+</style>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="root"><div id="boot">LOADING FORGE BOM…</div></div>
+
+<script type="text/babel" data-presets="react">
+const { useState, useRef, useMemo, useEffect } = React;
+
+
+function Icon({ size = 18, strokeWidth = 2, style, children }) {
+  return React.createElement("svg", {
+    width: size, height: size, viewBox: "0 0 24 24", fill: "none",
+    stroke: "currentColor", strokeWidth, strokeLinecap: "round",
+    strokeLinejoin: "round", style,
+  }, children);
+}
+const P = (d) => React.createElement("path", { d, key: d });
+const L = (x1,y1,x2,y2,k) => React.createElement("line", { x1,y1,x2,y2,key:k||(x1+","+y1+","+x2+","+y2) });
+const Poly = (pts,k) => React.createElement("polyline", { points: pts, key: k||pts });
+const C = (cx,cy,r,k) => React.createElement("circle", { cx,cy,r,key:k||(cx+","+cy) });
+const R = (x,y,w,h,rx,k) => React.createElement("rect", { x,y,width:w,height:h,rx,key:k||(x+","+y) });
+
+const Trash2 = (p) => Icon({ ...p, children: [P("M3 6h18"), P("M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"), L(10,11,10,17,"a"), L(14,11,14,17,"b")] });
+const Upload = (p) => Icon({ ...p, children: [P("M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"), Poly("17 8 12 3 7 8","a"), L(12,3,12,15,"b")] });
+const FileJson = (p) => Icon({ ...p, children: [P("M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"), Poly("14 2 14 8 20 8","a"), P("M10 12a1 1 0 0 0-1 1v1a1 1 0 0 1-1 1 1 1 0 0 1 1 1v1a1 1 0 0 0 1 1"), P("M14 18a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1 1 1 0 0 1-1-1v-1a1 1 0 0 0-1-1")] });
+const FileSpreadsheet = (p) => Icon({ ...p, children: [P("M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"), Poly("14 2 14 8 20 8","a"), L(8,13,16,13,"b"), L(8,17,16,17,"c"), L(12,13,12,17,"d")] });
+const Package = (p) => Icon({ ...p, children: [P("M16.5 9.4 7.5 4.21"), P("M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"), Poly("3.27 6.96 12 12.01 20.73 6.96","a"), L(12,22,12,12,"b")] });
+const Search = (p) => Icon({ ...p, children: [C(11,11,8,"a"), P("M21 21l-4.3-4.3")] });
+const Edit3 = (p) => Icon({ ...p, children: [L(12,20,21,20,"a"), P("M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z")] });
+const Check = (p) => Icon({ ...p, children: [Poly("20 6 9 17 4 12","a")] });
+const ChevronDown = (p) => Icon({ ...p, children: [Poly("6 9 12 15 18 9","a")] });
+const ChevronRight = (p) => Icon({ ...p, children: [Poly("9 18 15 12 9 6","a")] });
+const Box = (p) => Icon({ ...p, children: [P("M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"), Poly("3.27 6.96 12 12.01 20.73 6.96","a"), L(12,22,12,12,"b")] });
+const Ruler = (p) => Icon({ ...p, children: [P("M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"), P("M14.5 12.5 12 15"), P("M11.5 9.5 9 12"), P("M8.5 6.5 6 9"), P("M17.5 15.5 15 18")] });
+const Layers = (p) => Icon({ ...p, children: [P("M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"), P("M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"), P("M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17")] });
+const AlertTriangle = (p) => Icon({ ...p, children: [P("M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"), L(12,9,12,13,"a"), L(12,17,12.01,17,"b")] });
+
+
+function num(v) {
+  const n = parseFloat(v);
+  return isNaN(n) ? 0 : n;
+}
+
+// First-Fit-Decreasing nesting for one stock profile.
+// items: [{ len, partId }]  -> shared pool of sticks of stockLength (kerf per cut)
+function nestGroup(items, stockLength, kerf = 0) {
+  const cuts = items
+    .filter((it) => it.len > 0)
+    .map((it) => ({ ...it, eff: it.len + kerf }));
+  const impossible = cuts.some((c) => c.eff > stockLength && stockLength > 0);
+  if (impossible || cuts.length === 0 || stockLength <= 0) {
+    return { sticks: 0, scrap: 0, usableDrop: 0, totalCutLen: 0, impossible, bins: [] };
+  }
+  cuts.sort((a, b) => b.eff - a.eff); // longest first
+  const bins = [];
+  for (const c of cuts) {
+    let bin = bins.find((b) => b.remaining >= c.eff - 1e-9);
+    if (!bin) { bin = { remaining: stockLength, used: 0 }; bins.push(bin); }
+    bin.remaining -= c.eff;
+    bin.used += c.len;
+  }
+  const smallest = Math.min(...cuts.map((c) => c.eff));
+  let usableDrop = 0, scrap = 0;
+  for (const b of bins) {
+    if (b.remaining >= smallest - 1e-9) usableDrop += b.remaining;
+    else scrap += b.remaining;
+  }
+  const totalCutLen = cuts.reduce((s, c) => s + c.len, 0);
+  return {
+    sticks: bins.length,
+    scrap: Math.max(0, scrap),
+    usableDrop: Math.max(0, usableDrop),
+    totalCutLen,
+    impossible: false,
+    bins,
+  };
+}
+
+function BOMManager() {
+  const [productName, setProductName] = useState("New Assembly");
+  const [editingName, setEditingName] = useState(false);
+  const [buildQty, setBuildQty] = useState(10);
+  const [kerf, setKerf] = useState(0);
+  const [search, setSearch] = useState("");
+  const fileInputRef = useRef(null);
+  const nextId = useRef(5);
+
+  const [parts, setParts] = useState([
+    { id: 1, type: "discrete", partNumber: "PN-1001", name: "M3 Hex Bolt", qty: 12, unitCost: 0.08 },
+    { id: 2, type: "discrete", partNumber: "PN-1002", name: "Aluminum Bracket", qty: 2, unitCost: 4.5 },
+    { id: 3, type: "stock", partNumber: "PN-2001", name: "Main rail (long)", qty: 1, cutLength: 2.2, stockLength: 6, stockPrice: 48, unit: "m", profile: "SHS-25" },
+    { id: 4, type: "stock", partNumber: "PN-2002", name: "Cross brace (short)", qty: 3, cutLength: 1.4, stockLength: 6, stockPrice: 48, unit: "m", profile: "SHS-25" },
+  ]);
+
+  const [expanded, setExpanded] = useState({ 3: true, 4: true });
+
+  useEffect(() => {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap";
+    document.head.appendChild(link);
+    return () => { document.head.removeChild(link); };
+  }, []);
+
+  const addPart = (type) => {
+    const id = nextId.current++;
+    setParts((p) => [
+      ...p,
+      type === "stock"
+        ? { id, type: "stock", partNumber: "", name: "", qty: 1, cutLength: 0, stockLength: 6, stockPrice: 0, unit: "m", profile: "" }
+        : { id, type: "discrete", partNumber: "", name: "", qty: 1, unitCost: 0 },
+    ]);
+    if (type === "stock") setExpanded((e) => ({ ...e, [id]: true }));
+  };
+
+  const updatePart = (id, field, value) => {
+    const numeric = ["qty", "unitCost", "cutLength", "stockLength", "stockPrice"];
+    setParts((p) =>
+      p.map((part) =>
+        part.id === id
+          ? { ...part, [field]: numeric.includes(field) ? (value === "" ? "" : num(value)) : value }
+          : part
+      )
+    );
+  };
+
+  const removePart = (id) => setParts((p) => p.filter((x) => x.id !== id));
+  const toggleExpand = (id) => setExpanded((e) => ({ ...e, [id]: !e[id] }));
+
+  // ---- Build the nested groups across all stock parts ----
+  // Group key: profile code (trimmed). Parts with blank profile each form their
+  // own singleton group keyed by their id so they still nest internally.
+  const groups = useMemo(() => {
+    const bq = num(buildQty);
+    const map = new Map();
+    parts.forEach((p) => {
+      if (p.type !== "stock") return;
+      const key = (p.profile || "").trim() || `__solo_${p.id}`;
+      if (!map.has(key)) {
+        map.set(key, { key, label: (p.profile || "").trim(), parts: [], stockLength: 0, stockPrice: 0, unit: "m" });
+      }
+      const g = map.get(key);
+      g.parts.push(p);
+      // Use the (max) stock length / price seen in the group as the group's stock.
+      g.stockLength = Math.max(g.stockLength, num(p.stockLength));
+      g.stockPrice = num(p.stockPrice) || g.stockPrice;
+      g.unit = p.unit || g.unit;
+    });
+
+    const result = new Map();
+    for (const g of map.values()) {
+      const items = [];
+      g.parts.forEach((p) => {
+        const cutsPerProduct = num(p.qty);
+        const totalCuts = Math.round(cutsPerProduct * bq);
+        for (let i = 0; i < totalCuts; i++) items.push({ len: num(p.cutLength), partId: p.id });
+      });
+      const nest = nestGroup(items, g.stockLength, num(kerf));
+      const purchaseCost = nest.sticks * g.stockPrice;
+      // Allocate purchase cost to each part by share of consumed length.
+      const perPartLen = {};
+      g.parts.forEach((p) => {
+        perPartLen[p.id] = num(p.cutLength) * num(p.qty) * bq;
+      });
+      const totalLen = Object.values(perPartLen).reduce((s, v) => s + v, 0);
+      const perPartCost = {};
+      g.parts.forEach((p) => {
+        perPartCost[p.id] = totalLen > 0 ? (perPartLen[p.id] / totalLen) * purchaseCost : 0;
+      });
+      result.set(g.key, { ...g, nest, purchaseCost, perPartLen, perPartCost, totalLen });
+    }
+    return result;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [parts, buildQty, kerf]);
+
+  // group lookup by part id
+  const groupOfPart = useMemo(() => {
+    const m = new Map();
+    for (const g of groups.values()) g.parts.forEach((p) => m.set(p.id, g));
+    return m;
+  }, [groups]);
+
+  const computePart = (part) => {
+    if (part.type === "stock") {
+      const cut = num(part.cutLength);
+      const sl = num(part.stockLength);
+      const sp = num(part.stockPrice);
+      const cutsPerProduct = num(part.qty);
+      const perMeter = sl > 0 ? sp / sl : 0;
+      const consumedPerProduct = cut * cutsPerProduct;
+      const usedCostPerProduct = consumedPerProduct * perMeter; // honest material cost / product
+      const g = groupOfPart.get(part.id);
+      const allocBuild = g ? (g.perPartCost[part.id] || 0) : 0; // share of shared purchase
+      const bq = num(buildQty);
+      const allocPerProduct = bq > 0 ? allocBuild / bq : 0;
+      return {
+        type: "stock", perMeter, consumedPerProduct, usedCostPerProduct,
+        allocBuild, allocPerProduct, profile: (part.profile || "").trim(),
+        unit: part.unit || "m",
+      };
+    }
+    const usedCostPerProduct = num(part.qty) * num(part.unitCost);
+    return {
+      type: "discrete", usedCostPerProduct,
+      allocBuild: usedCostPerProduct * num(buildQty),
+      allocPerProduct: usedCostPerProduct,
+    };
+  };
+
+  const filtered = useMemo(() => {
+    if (!search.trim()) return parts;
+    const q = search.toLowerCase();
+    return parts.filter(
+      (p) => p.name.toLowerCase().includes(q) || p.partNumber.toLowerCase().includes(q) ||
+             (p.profile || "").toLowerCase().includes(q)
+    );
+  }, [parts, search]);
+
+  const totals = useMemo(() => {
+    let unitCost = 0, purchaseCost = 0, stockProfiles = 0;
+    const lineItems = parts.length;
+    parts.forEach((p) => { if (p.type === "discrete") unitCost += num(p.qty) * num(p.unitCost); });
+    parts.forEach((p) => {
+      if (p.type === "stock") {
+        const c = computePart(p);
+        unitCost += c.usedCostPerProduct;
+      }
+    });
+    purchaseCost += parts.filter((p) => p.type === "discrete")
+      .reduce((s, p) => s + num(p.qty) * num(p.unitCost) * num(buildQty), 0);
+    for (const g of groups.values()) purchaseCost += g.purchaseCost;
+    stockProfiles = new Set(
+      parts.filter((p) => p.type === "stock").map((p) => (p.profile || "").trim() || `__solo_${p.id}`)
+    ).size;
+    return { unitCost, purchaseCost, lineItems, stockProfiles, buildQty: num(buildQty) };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [parts, buildQty, kerf, groups]);
+
+  const fmt = (n, d = 2) =>
+    (isFinite(n) ? n : 0).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+
+  const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "bom";
+  const download = (content, filename, type) => {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportCSV = () => {
+    const header = ["Type", "Profile", "Part Number", "Name", "Qty/Cuts", "Unit Cost", "Cut Length", "Stock Length", "Stock Price", "Unit", "Used Cost/Product", "Alloc Cost (build)"];
+    const rows = parts.map((p) => {
+      const c = computePart(p);
+      return [
+        p.type, p.type === "stock" ? (p.profile || "") : "", p.partNumber, p.name, p.qty,
+        p.type === "discrete" ? num(p.unitCost).toFixed(4) : "",
+        p.type === "stock" ? num(p.cutLength) : "",
+        p.type === "stock" ? num(p.stockLength) : "",
+        p.type === "stock" ? num(p.stockPrice).toFixed(2) : "",
+        p.type === "stock" ? p.unit : "",
+        c.usedCostPerProduct.toFixed(4),
+        c.allocBuild.toFixed(2),
+      ];
+    });
+    const groupLines = ["", "# MATERIAL GROUPS (nested purchasing)",
+      "Profile,Sticks,Stock Length,Stock Price,Purchase Cost,Scrap,Reusable Drop"];
+    for (const g of groups.values()) {
+      if (!g.label) continue;
+      groupLines.push([g.label, g.nest.sticks, g.stockLength, g.stockPrice.toFixed(2),
+        g.purchaseCost.toFixed(2), g.nest.scrap.toFixed(3), g.nest.usableDrop.toFixed(3)].join(","));
+    }
+    const csv = [
+      `# BOM: ${productName}`,
+      `# BuildQty: ${buildQty}  Kerf: ${kerf}`,
+      header.join(","),
+      ...rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")),
+      `,,,,,,,,,Unit cost: ${totals.unitCost.toFixed(2)},,Build purchase: ${totals.purchaseCost.toFixed(2)}`,
+      ...groupLines,
+    ].join("\n");
+    download(csv, `${slug(productName)}-bom.csv`, "text/csv");
+  };
+
+  const exportJSON = () => {
+    const groupSummary = [];
+    for (const g of groups.values()) {
+      groupSummary.push({
+        profile: g.label || null,
+        sticks: g.nest.sticks,
+        stockLength: g.stockLength,
+        stockPrice: g.stockPrice,
+        purchaseCost: +g.purchaseCost.toFixed(2),
+        scrap: +g.nest.scrap.toFixed(3),
+        reusableDrop: +g.nest.usableDrop.toFixed(3),
+        impossible: g.nest.impossible,
+        parts: g.parts.map((p) => p.partNumber || p.name),
+      });
+    }
+    const data = {
+      product: productName, buildQty: num(buildQty), kerf: num(kerf),
+      generated: new Date().toISOString(),
+      summary: {
+        unitCost: +totals.unitCost.toFixed(4),
+        buildPurchaseCost: +totals.purchaseCost.toFixed(2),
+        lineItems: totals.lineItems,
+      },
+      materialGroups: groupSummary,
+      parts: parts.map(({ id, ...rest }) => rest),
+    };
+    download(JSON.stringify(data, null, 2), `${slug(productName)}-bom.json`, "application/json");
+  };
+
+  const parseCSVLine = (line) => {
+    const out = []; let cur = ""; let q = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { if (q && line[i + 1] === '"') { cur += '"'; i++; } else q = !q; }
+      else if (ch === "," && !q) { out.push(cur); cur = ""; }
+      else cur += ch;
+    }
+    out.push(cur);
+    return out.map((c) => c.trim());
+  };
+
+  const handleImport = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const text = ev.target.result;
+      try {
+        if (file.name.endsWith(".json")) {
+          const d = JSON.parse(text);
+          if (d.product) setProductName(d.product);
+          if (d.buildQty != null) setBuildQty(d.buildQty);
+          if (d.kerf != null) setKerf(d.kerf);
+          if (Array.isArray(d.parts)) {
+            setParts(d.parts.map((p) => ({
+              id: nextId.current++,
+              type: p.type === "stock" ? "stock" : "discrete",
+              partNumber: p.partNumber || "", name: p.name || "",
+              qty: num(p.qty), unitCost: num(p.unitCost), cutLength: num(p.cutLength),
+              stockLength: num(p.stockLength) || 6, stockPrice: num(p.stockPrice),
+              unit: p.unit || "m", profile: p.profile || "",
+            })));
+          }
+        } else {
+          const lines = text.split(/\r?\n/).filter((l) => l.trim());
+          const titleLine = lines.find((l) => /^#\s*bom:/i.test(l));
+          if (titleLine) setProductName(titleLine.replace(/^#\s*bom:\s*/i, "").trim());
+          const buildLine = lines.find((l) => /buildqty/i.test(l));
+          if (buildLine) {
+            const m = buildLine.match(/buildqty:\s*([\d.]+)/i);
+            if (m) setBuildQty(num(m[1]));
+            const k = buildLine.match(/kerf:\s*([\d.]+)/i);
+            if (k) setKerf(num(k[1]));
+          }
+          // only parse the part table (stop at the group section)
+          const groupIdx = lines.findIndex((l) => /material groups/i.test(l));
+          const scan = groupIdx >= 0 ? lines.slice(0, groupIdx) : lines;
+          const dataLines = scan.filter(
+            (l) => !l.startsWith("#") && !/^"?type/i.test(l) && !/unit cost:/i.test(l)
+          );
+          const imported = dataLines.map((line) => {
+            const c = parseCSVLine(line);
+            const type = (c[0] || "discrete").toLowerCase() === "stock" ? "stock" : "discrete";
+            return {
+              id: nextId.current++, type,
+              profile: c[1] || "",
+              partNumber: c[2] || "", name: c[3] || "",
+              qty: num(c[4]), unitCost: num(c[5]), cutLength: num(c[6]),
+              stockLength: num(c[7]) || 6, stockPrice: num(c[8]), unit: c[9] || "m",
+            };
+          }).filter((p) => p.partNumber || p.name);
+          if (imported.length) setParts(imported);
+        }
+      } catch (err) {
+        alert("Could not parse file: " + err.message);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  };
+
+  // groups that actually share (more than one part OR a named profile) for the summary
+  const summaryGroups = useMemo(
+    () => [...groups.values()].filter((g) => g.parts.length > 0),
+    [groups]
+  );
+
+  return (
+    <div style={styles.root}>
+      <style>{css}</style>
+      <div style={styles.gridBg} />
+      <div style={styles.container}>
+        <header style={styles.header}>
+          <div style={styles.brandRow}>
+            <div style={styles.logoMark}><Package size={22} strokeWidth={2.2} /></div>
+            <div>
+              <div style={styles.kicker}>BILL OF MATERIALS</div>
+              <div style={styles.brandName}>FORGE BOM</div>
+            </div>
+          </div>
+          <div style={styles.actions}>
+            <button className="ghost-btn" style={styles.ghostBtn} onClick={() => fileInputRef.current?.click()}><Upload size={15} /> Import</button>
+            <button className="ghost-btn" style={styles.ghostBtn} onClick={exportCSV}><FileSpreadsheet size={15} /> CSV</button>
+            <button className="ghost-btn" style={styles.ghostBtn} onClick={exportJSON}><FileJson size={15} /> JSON</button>
+            <input ref={fileInputRef} type="file" accept=".csv,.json" onChange={handleImport} style={{ display: "none" }} />
+          </div>
+        </header>
+
+        <div style={styles.titleBlock}>
+          <span style={styles.titleLabel}>PRODUCT / ASSEMBLY</span>
+          {editingName ? (
+            <div style={styles.titleEditRow}>
+              <input autoFocus value={productName} onChange={(e) => setProductName(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && setEditingName(false)} style={styles.titleInput} />
+              <button style={styles.iconConfirm} onClick={() => setEditingName(false)}><Check size={16} /></button>
+            </div>
+          ) : (
+            <div style={styles.titleDisplay} onClick={() => setEditingName(true)}>
+              <h1 style={styles.title}>{productName}</h1>
+              <Edit3 size={16} style={{ opacity: 0.4 }} />
+            </div>
+          )}
+        </div>
+
+        <div style={styles.buildBar}>
+          <div style={styles.buildField}>
+            <label style={styles.buildLabel}>BUILD QTY</label>
+            <input type="number" min="1" value={buildQty}
+              onChange={(e) => setBuildQty(e.target.value === "" ? "" : Math.max(0, num(e.target.value)))} style={styles.buildInput} />
+            <span style={styles.buildHint}>products</span>
+          </div>
+          <div style={styles.buildDivider} />
+          <div style={styles.buildField}>
+            <label style={styles.buildLabel}>KERF</label>
+            <input type="number" min="0" step="0.001" value={kerf}
+              onChange={(e) => setKerf(e.target.value === "" ? "" : Math.max(0, num(e.target.value)))} style={styles.buildInput} />
+            <span style={styles.buildHint}>per cut</span>
+          </div>
+        </div>
+
+        <div style={styles.statsGrid}>
+          <Stat label="Cost / Product" value={`$${fmt(totals.unitCost)}`} accent />
+          <Stat label={`Buy for ${totals.buildQty}`} value={`$${fmt(totals.purchaseCost)}`} />
+          <Stat label="Line Items" value={totals.lineItems} />
+          <Stat label="Stock Profiles" value={totals.stockProfiles} />
+        </div>
+
+        <div style={styles.toolbar}>
+          <div style={styles.searchWrap}>
+            <Search size={16} style={{ opacity: 0.4 }} />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search part, number, or profile…" style={styles.searchInput} />
+          </div>
+          <button className="ghost-btn" style={styles.addBtnAlt} onClick={() => addPart("discrete")}><Box size={15} /> Discrete</button>
+          <button className="add-btn" style={styles.addBtn} onClick={() => addPart("stock")}><Ruler size={15} /> Stock</button>
+        </div>
+
+        <div style={styles.tableCard}>
+          <div style={styles.tableHead}>
+            <div style={{ ...styles.th, flex: "0 0 24px" }} />
+            <div style={{ ...styles.th, flex: "0 0 120px" }}>PART NO.</div>
+            <div style={{ ...styles.th, flex: 1 }}>DESCRIPTION</div>
+            <div style={{ ...styles.th, flex: "0 0 70px", textAlign: "right" }}>QTY</div>
+            <div style={{ ...styles.th, flex: "0 0 120px", textAlign: "right" }}>COST / PROD.</div>
+            <div style={{ ...styles.th, flex: "0 0 130px", textAlign: "right" }}>SHARE OF BUY</div>
+            <div style={{ ...styles.th, flex: "0 0 36px" }} />
+          </div>
+
+          {filtered.length === 0 ? (
+            <div style={styles.empty}>{parts.length === 0 ? "No parts yet — add a Discrete or Stock part to begin." : "No parts match your search."}</div>
+          ) : (
+            filtered.map((part, i) => {
+              const c = computePart(part);
+              const isStock = part.type === "stock";
+              const open = !!expanded[part.id];
+              return (
+                <div key={part.id} style={{ animation: `rowIn 0.3s ease ${i * 0.03}s both` }}>
+                  <div className="bom-row" style={styles.row}>
+                    <div style={{ flex: "0 0 24px", display: "flex", justifyContent: "center" }}>
+                      {isStock ? (
+                        <button className="exp-btn" style={styles.expBtn} onClick={() => toggleExpand(part.id)}>
+                          {open ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
+                        </button>
+                      ) : (<span style={styles.discDot} title="Discrete part" />)}
+                    </div>
+                    <input className="cell-input" value={part.partNumber}
+                      onChange={(e) => updatePart(part.id, "partNumber", e.target.value)} placeholder="PN-…"
+                      style={{ ...styles.cellInput, flex: "0 0 120px", fontFamily: "var(--mono)", fontWeight: 600, color: isStock ? "var(--accent2)" : "var(--accent)" }} />
+                    <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+                      <input className="cell-input" value={part.name}
+                        onChange={(e) => updatePart(part.id, "name", e.target.value)}
+                        placeholder={isStock ? "Pipe / bar description" : "Part description"}
+                        style={{ ...styles.cellInput, flex: 1 }} />
+                      {isStock && c.profile && <span style={styles.profileTag}>{c.profile}</span>}
+                    </div>
+                    <input className="cell-input" type="number" value={part.qty}
+                      onChange={(e) => updatePart(part.id, "qty", e.target.value)}
+                      title={isStock ? "Cuts per product" : "Quantity per product"}
+                      style={{ ...styles.cellInput, flex: "0 0 70px", textAlign: "right" }} min="0" />
+                    <div style={{ ...styles.lineTotal, flex: "0 0 120px" }}>${fmt(c.usedCostPerProduct)}</div>
+                    <div style={{ ...styles.buyTotal, flex: "0 0 130px" }}>${fmt(c.allocBuild)}</div>
+                    <button className="del-btn" style={styles.delBtn} onClick={() => removePart(part.id)} title="Remove"><Trash2 size={15} /></button>
+                  </div>
+
+                  {isStock && open && (
+                    <div style={styles.detail}>
+                      <div style={styles.detailGrid}>
+                        <DetailField label="Profile / material code">
+                          <input className="cell-input" value={part.profile}
+                            onChange={(e) => updatePart(part.id, "profile", e.target.value)}
+                            placeholder="e.g. SHS-25"
+                            style={{ ...styles.detailInput, width: 150, color: "var(--accent2)", fontWeight: 600 }} />
+                        </DetailField>
+                        <DetailField label="Cut length / cut" unit={part.unit}>
+                          <input className="cell-input" type="number" step="0.001" value={part.cutLength}
+                            onChange={(e) => updatePart(part.id, "cutLength", e.target.value)} style={styles.detailInput} min="0" />
+                        </DetailField>
+                        <DetailField label="Stock length" unit={part.unit}>
+                          <input className="cell-input" type="number" step="0.001" value={part.stockLength}
+                            onChange={(e) => updatePart(part.id, "stockLength", e.target.value)} style={styles.detailInput} min="0" />
+                        </DetailField>
+                        <DetailField label="Price / stick" unit="$">
+                          <input className="cell-input" type="number" step="0.01" value={part.stockPrice}
+                            onChange={(e) => updatePart(part.id, "stockPrice", e.target.value)} style={styles.detailInput} min="0" />
+                        </DetailField>
+                        <DetailField label="Unit">
+                          <select className="cell-input" value={part.unit}
+                            onChange={(e) => updatePart(part.id, "unit", e.target.value)}
+                            style={{ ...styles.detailInput, width: 80, cursor: "pointer" }}>
+                            <option value="m">m</option><option value="mm">mm</option><option value="cm">cm</option>
+                            <option value="ft">ft</option><option value="in">in</option>
+                          </select>
+                        </DetailField>
+                      </div>
+                      <div style={styles.partCalc}>
+                        <Calc label="Price / unit length" value={`$${fmt(c.perMeter, 3)}/${part.unit}`} />
+                        <Calc label="Used per product" value={`${fmt(c.consumedPerProduct, 3)} ${part.unit}`} />
+                        <Calc label="Material cost / product" value={`$${fmt(c.usedCostPerProduct)}`} />
+                        <Calc label="Share of shared sticks" value={`$${fmt(c.allocBuild)}`} highlight />
+                      </div>
+                      {!part.profile && (
+                        <div style={styles.hintBanner}>
+                          No profile code — this part nests on its own. Give two parts the same code (e.g. “SHS-25”) to share sticks and reuse drops between them.
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+
+          <div style={styles.tableFoot}>
+            <div style={styles.footMeta}>{totals.lineItems} line items · {totals.stockProfiles} stock profiles · build {totals.buildQty}</div>
+            <div style={styles.footTotals}>
+              <div style={styles.footBlock}>
+                <span style={styles.footLabel}>COST / PRODUCT</span>
+                <span style={styles.footValueSm}>${fmt(totals.unitCost)}</span>
+              </div>
+              <div style={styles.footBlock}>
+                <span style={styles.footLabel}>PURCHASE FOR {totals.buildQty}</span>
+                <span style={styles.footValue}>${fmt(totals.purchaseCost)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ---- Material group summary (shared nesting) ---- */}
+        {summaryGroups.length > 0 && (
+          <div style={styles.groupSection}>
+            <div style={styles.groupHeader}>
+              <Layers size={16} style={{ color: "var(--accent2)" }} />
+              <span style={styles.groupHeaderText}>MATERIAL GROUPS — SHARED STICK POOLS</span>
+            </div>
+            <div style={styles.groupGrid}>
+              {summaryGroups.map((g) => {
+                const wasted = g.nest.totalCutLen + g.nest.scrap + g.nest.usableDrop;
+                const yieldPct = wasted > 0 ? (g.nest.totalCutLen / (g.nest.sticks * g.stockLength || 1)) * 100 : 0;
+                return (
+                  <div key={g.key} style={styles.groupCard}>
+                    <div style={styles.groupCardTop}>
+                      <div>
+                        <div style={styles.groupCode}>{g.label || "(no code — solo)"}</div>
+                        <div style={styles.groupSub}>
+                          {g.parts.length} part{g.parts.length > 1 ? "s" : ""} · {g.stockLength} {g.unit} sticks @ ${fmt(g.stockPrice)}
+                        </div>
+                      </div>
+                      <div style={styles.groupSticks}>
+                        <span style={styles.groupSticksNum}>{g.nest.sticks}</span>
+                        <span style={styles.groupSticksLbl}>sticks</span>
+                      </div>
+                    </div>
+
+                    {g.nest.impossible ? (
+                      <div style={styles.warnBanner}>
+                        <AlertTriangle size={14} /> A cut (+ kerf) is longer than the stock — fix the cut or stock length.
+                      </div>
+                    ) : (
+                      <>
+                        <div style={styles.groupStats}>
+                          <GroupStat label="Purchase" value={`$${fmt(g.purchaseCost)}`} />
+                          <GroupStat label="Material used" value={`${fmt(g.nest.totalCutLen, 2)} ${g.unit}`} />
+                          <GroupStat label="Reusable drop" value={`${fmt(g.nest.usableDrop, 2)} ${g.unit}`} good />
+                          <GroupStat label="Scrap" value={`${fmt(g.nest.scrap, 2)} ${g.unit}`} warn />
+                        </div>
+                        <div style={styles.yieldRow}>
+                          <div style={styles.yieldBarTrack}>
+                            <div style={{ ...styles.yieldBarFill, width: `${Math.min(100, yieldPct)}%` }} />
+                          </div>
+                          <span style={styles.yieldLabel}>{fmt(yieldPct, 0)}% yield</span>
+                        </div>
+                        <div style={styles.groupPartList}>
+                          {g.parts.map((p) => (
+                            <div key={p.id} style={styles.groupPartRow}>
+                              <span style={styles.groupPartName}>
+                                {p.partNumber || p.name || "—"} · {num(p.cutLength)}{g.unit} × {Math.round(num(p.qty) * totals.buildQty)}
+                              </span>
+                              <span style={styles.groupPartCost}>${fmt(g.perPartCost[p.id] || 0)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        <footer style={styles.pageFoot}>
+          Stock parts that share a <b style={{ color: "var(--accent2)" }}>profile code</b> are nested into one shared pool of
+          sticks using a longest-first (first-fit-decreasing) cut plan, so a short cut drops into the leftover from a long
+          cut instead of opening a new stick. The <b style={{ color: "var(--accent)" }}>cost / product</b> still charges only
+          the length each part consumes; <b style={{ color: "var(--accent2)" }}>share of buy</b> splits each group’s real
+          stick cost across its parts by length. Reusable drop is leftover long enough for another cut; scrap is too short.
+          Set kerf for blade width. Export to save; import to reload.
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+function Stat({ label, value, accent }) {
+  return (
+    <div style={{ ...styles.statCard, ...(accent ? styles.statAccent : {}) }}>
+      <div style={styles.statLabel}>{label}</div>
+      <div style={{ ...styles.statValue, ...(accent ? { color: "var(--accent)" } : {}) }}>{value}</div>
+    </div>
+  );
+}
+
+function DetailField({ label, unit, children }) {
+  return (
+    <div style={styles.detailField}>
+      <label style={styles.detailLabel}>{label} {unit && <span style={{ opacity: 0.5 }}>({unit})</span>}</label>
+      {children}
+    </div>
+  );
+}
+
+function Calc({ label, value, highlight }) {
+  return (
+    <div style={styles.calcItem}>
+      <div style={styles.calcLabel}>{label}</div>
+      <div style={{ ...styles.calcValue, color: highlight ? "var(--accent2)" : "var(--text)" }}>{value}</div>
+    </div>
+  );
+}
+
+function GroupStat({ label, value, good, warn }) {
+  const color = good ? "#56d364" : warn ? "#e0a64f" : "var(--text)";
+  return (
+    <div style={styles.gStat}>
+      <div style={styles.gStatLabel}>{label}</div>
+      <div style={{ ...styles.gStatValue, color }}>{value}</div>
+    </div>
+  );
+}
+
+const css = `
+  input::placeholder { color: rgba(230,237,243,0.25); }
+  input[type=number]::-webkit-inner-spin-button { opacity: 0.3; }
+  select { background: var(--panel2); color: var(--text); }
+  select option { background: #1c2230; }
+  .cell-input:hover { background: var(--panel2) !important; }
+  .cell-input:focus { background: var(--panel2) !important; border-color: var(--accent) !important; }
+  .ghost-btn:hover { border-color: var(--accent) !important; color: var(--accent) !important; }
+  .del-btn:hover { background: rgba(255,94,58,0.12) !important; color: #ff5e3a !important; }
+  .exp-btn:hover { color: var(--accent2) !important; }
+  .add-btn:hover { transform: translateY(-1px); filter: brightness(1.08); }
+  .bom-row:hover { background: rgba(28,34,48,0.4); }
+  @keyframes rowIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+`;
+
+const styles = {
+  root: {
+    "--bg": "#0d1117", "--panel": "#161b22", "--panel2": "#1c2230",
+    "--line": "#2d3543", "--text": "#e6edf3", "--muted": "#8b949e",
+    "--accent": "#ff8c42", "--accent2": "#4fd1c5",
+    "--mono": "'JetBrains Mono','SF Mono',Menlo,monospace",
+    "--sans": "'Space Grotesk',system-ui,sans-serif",
+    minHeight: "100vh", background: "var(--bg)", color: "var(--text)",
+    fontFamily: "var(--sans)", position: "relative", overflow: "hidden",
+  },
+  gridBg: {
+    position: "absolute", inset: 0,
+    backgroundImage: "linear-gradient(rgba(79,209,197,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(79,209,197,0.04) 1px,transparent 1px)",
+    backgroundSize: "40px 40px",
+    maskImage: "radial-gradient(ellipse at top,black 40%,transparent 90%)",
+    pointerEvents: "none",
+  },
+  container: { position: "relative", maxWidth: 1000, margin: "0 auto", padding: "36px 24px 60px" },
+  header: { display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16, marginBottom: 32 },
+  brandRow: { display: "flex", alignItems: "center", gap: 14 },
+  logoMark: { width: 44, height: 44, borderRadius: 10, background: "linear-gradient(135deg,var(--accent),#ff5e3a)", display: "flex", alignItems: "center", justifyContent: "center", color: "#0d1117", boxShadow: "0 4px 20px rgba(255,140,66,0.3)" },
+  kicker: { fontFamily: "var(--mono)", fontSize: 10, letterSpacing: 3, color: "var(--accent2)", marginBottom: 2 },
+  brandName: { fontSize: 22, fontWeight: 700, letterSpacing: -0.5 },
+  actions: { display: "flex", gap: 8, flexWrap: "wrap" },
+  ghostBtn: { display: "flex", alignItems: "center", gap: 6, background: "var(--panel)", border: "1px solid var(--line)", color: "var(--text)", padding: "9px 14px", borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "var(--sans)", transition: "all 0.15s" },
+  titleBlock: { marginBottom: 22 },
+  titleLabel: { fontFamily: "var(--mono)", fontSize: 11, letterSpacing: 2, color: "var(--muted)" },
+  titleDisplay: { display: "flex", alignItems: "center", gap: 12, cursor: "pointer", marginTop: 4 },
+  title: { fontSize: 34, fontWeight: 700, letterSpacing: -1, margin: 0 },
+  titleEditRow: { display: "flex", alignItems: "center", gap: 10, marginTop: 4 },
+  titleInput: { fontSize: 34, fontWeight: 700, letterSpacing: -1, background: "transparent", border: "none", borderBottom: "2px solid var(--accent)", color: "var(--text)", outline: "none", fontFamily: "var(--sans)", padding: "0 0 4px", width: "100%", maxWidth: 500 },
+  iconConfirm: { background: "var(--accent)", border: "none", color: "#0d1117", width: 36, height: 36, borderRadius: 8, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" },
+  buildBar: { display: "flex", alignItems: "center", gap: 0, background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 12, padding: "6px 8px", marginBottom: 20, width: "fit-content" },
+  buildField: { display: "flex", alignItems: "center", gap: 10, padding: "8px 16px" },
+  buildLabel: { fontFamily: "var(--mono)", fontSize: 10.5, letterSpacing: 1.5, color: "var(--muted)" },
+  buildInput: { width: 64, background: "var(--panel2)", border: "1px solid var(--line)", borderRadius: 6, color: "var(--text)", padding: "7px 8px", fontSize: 15, fontWeight: 600, outline: "none", fontFamily: "var(--mono)", textAlign: "right" },
+  buildHint: { fontSize: 12, color: "var(--muted)" },
+  buildDivider: { width: 1, alignSelf: "stretch", background: "var(--line)", margin: "6px 0" },
+  statsGrid: { display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 24 },
+  statCard: { background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 12, padding: "16px 18px" },
+  statAccent: { background: "linear-gradient(135deg,rgba(255,140,66,0.08),rgba(255,140,66,0.02))", borderColor: "rgba(255,140,66,0.3)" },
+  statLabel: { fontFamily: "var(--mono)", fontSize: 10.5, letterSpacing: 1.2, color: "var(--muted)", marginBottom: 8 },
+  statValue: { fontSize: 25, fontWeight: 700, letterSpacing: -0.5 },
+  toolbar: { display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap" },
+  searchWrap: { display: "flex", alignItems: "center", gap: 10, background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 8, padding: "0 14px", flex: 1, minWidth: 180 },
+  searchInput: { background: "transparent", border: "none", color: "var(--text)", outline: "none", padding: "11px 0", fontSize: 14, flex: 1, fontFamily: "var(--sans)" },
+  addBtnAlt: { display: "flex", alignItems: "center", gap: 7, background: "var(--panel)", border: "1px solid var(--line)", color: "var(--text)", padding: "11px 18px", borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "var(--sans)", transition: "all 0.15s" },
+  addBtn: { display: "flex", alignItems: "center", gap: 7, background: "var(--accent2)", border: "none", color: "#08302b", padding: "11px 20px", borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "var(--sans)", boxShadow: "0 4px 16px rgba(79,209,197,0.25)", transition: "all 0.15s" },
+  tableCard: { background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, overflow: "hidden" },
+  tableHead: { display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", borderBottom: "1px solid var(--line)", background: "var(--panel2)" },
+  th: { fontFamily: "var(--mono)", fontSize: 10.5, letterSpacing: 1.2, color: "var(--muted)", fontWeight: 600 },
+  row: { display: "flex", alignItems: "center", gap: 12, padding: "8px 18px", borderBottom: "1px solid rgba(45,53,67,0.5)" },
+  expBtn: { background: "transparent", border: "none", color: "var(--muted)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0 },
+  discDot: { width: 7, height: 7, borderRadius: "50%", background: "var(--accent)", opacity: 0.6, display: "block" },
+  cellInput: { background: "transparent", border: "1px solid transparent", borderRadius: 6, color: "var(--text)", padding: "8px 10px", fontSize: 14, outline: "none", fontFamily: "var(--sans)", transition: "all 0.15s", minWidth: 0 },
+  profileTag: { fontSize: 10.5, fontFamily: "var(--mono)", background: "rgba(79,209,197,0.14)", color: "var(--accent2)", padding: "3px 8px", borderRadius: 5, letterSpacing: 0.5, whiteSpace: "nowrap", flexShrink: 0 },
+  lineTotal: { textAlign: "right", fontFamily: "var(--mono)", fontSize: 14, fontWeight: 600, color: "var(--accent)" },
+  buyTotal: { textAlign: "right", fontFamily: "var(--mono)", fontSize: 14, fontWeight: 600, color: "var(--accent2)" },
+  delBtn: { flex: "0 0 36px", background: "transparent", border: "none", color: "var(--muted)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 8, borderRadius: 6, transition: "all 0.15s" },
+  detail: { padding: "4px 18px 20px 54px", background: "rgba(28,34,48,0.35)", borderBottom: "1px solid rgba(45,53,67,0.5)" },
+  detailGrid: { display: "flex", gap: 14, flexWrap: "wrap", marginBottom: 14, paddingTop: 12, alignItems: "flex-end" },
+  detailField: { display: "flex", flexDirection: "column", gap: 5 },
+  detailLabel: { fontFamily: "var(--mono)", fontSize: 10, letterSpacing: 1, color: "var(--muted)" },
+  detailInput: { width: 120, background: "var(--panel2)", border: "1px solid var(--line)", borderRadius: 6, color: "var(--text)", padding: "8px 10px", fontSize: 14, outline: "none", fontFamily: "var(--mono)" },
+  partCalc: { display: "flex", flexWrap: "wrap", gap: 0, background: "var(--bg)", border: "1px solid var(--line)", borderRadius: 10, overflow: "hidden" },
+  calcItem: { flex: "1 1 140px", padding: "12px 14px", borderRight: "1px solid var(--line)", minWidth: 130 },
+  calcLabel: { fontFamily: "var(--mono)", fontSize: 9.5, letterSpacing: 0.8, color: "var(--muted)", marginBottom: 6 },
+  calcValue: { fontFamily: "var(--mono)", fontSize: 15, fontWeight: 600 },
+  hintBanner: { marginTop: 10, padding: "9px 13px", background: "rgba(79,209,197,0.08)", border: "1px solid rgba(79,209,197,0.25)", borderRadius: 8, color: "var(--accent2)", fontSize: 12, lineHeight: 1.5 },
+  warnBanner: { marginTop: 10, padding: "10px 14px", background: "rgba(224,166,79,0.12)", border: "1px solid rgba(224,166,79,0.35)", borderRadius: 8, color: "#e0a64f", fontSize: 12.5, lineHeight: 1.5, display: "flex", alignItems: "center", gap: 8 },
+  empty: { padding: "48px 20px", textAlign: "center", color: "var(--muted)", fontSize: 14 },
+  tableFoot: { display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16, padding: "18px 20px", background: "var(--panel2)", borderTop: "1px solid var(--line)" },
+  footMeta: { fontFamily: "var(--mono)", fontSize: 12, letterSpacing: 0.5, color: "var(--muted)" },
+  footTotals: { display: "flex", gap: 28, alignItems: "flex-end" },
+  footBlock: { display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2 },
+  footLabel: { fontSize: 10.5, fontFamily: "var(--mono)", letterSpacing: 1, color: "var(--muted)" },
+  footValue: { fontFamily: "var(--mono)", fontSize: 24, fontWeight: 700, color: "var(--accent2)" },
+  footValueSm: { fontFamily: "var(--mono)", fontSize: 18, fontWeight: 700, color: "var(--accent)" },
+  groupSection: { marginTop: 28 },
+  groupHeader: { display: "flex", alignItems: "center", gap: 9, marginBottom: 14 },
+  groupHeaderText: { fontFamily: "var(--mono)", fontSize: 11, letterSpacing: 2, color: "var(--muted)", fontWeight: 600 },
+  groupGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(320px,1fr))", gap: 14 },
+  groupCard: { background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: "18px 18px 14px" },
+  groupCardTop: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 },
+  groupCode: { fontFamily: "var(--mono)", fontSize: 17, fontWeight: 700, color: "var(--accent2)", letterSpacing: 0.5 },
+  groupSub: { fontSize: 12, color: "var(--muted)", marginTop: 3 },
+  groupSticks: { display: "flex", flexDirection: "column", alignItems: "flex-end" },
+  groupSticksNum: { fontFamily: "var(--mono)", fontSize: 30, fontWeight: 700, color: "var(--text)", lineHeight: 1 },
+  groupSticksLbl: { fontFamily: "var(--mono)", fontSize: 10, letterSpacing: 1, color: "var(--muted)", marginTop: 2 },
+  groupStats: { display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 1, background: "var(--line)", border: "1px solid var(--line)", borderRadius: 9, overflow: "hidden", marginBottom: 12 },
+  gStat: { background: "var(--bg)", padding: "10px 12px" },
+  gStatLabel: { fontFamily: "var(--mono)", fontSize: 9.5, letterSpacing: 0.6, color: "var(--muted)", marginBottom: 5 },
+  gStatValue: { fontFamily: "var(--mono)", fontSize: 15, fontWeight: 600 },
+  yieldRow: { display: "flex", alignItems: "center", gap: 10, marginBottom: 14 },
+  yieldBarTrack: { flex: 1, height: 6, background: "var(--bg)", borderRadius: 3, overflow: "hidden", border: "1px solid var(--line)" },
+  yieldBarFill: { height: "100%", background: "linear-gradient(90deg,var(--accent2),#56d364)", borderRadius: 3, transition: "width 0.3s" },
+  yieldLabel: { fontFamily: "var(--mono)", fontSize: 11, color: "var(--muted)", whiteSpace: "nowrap" },
+  groupPartList: { display: "flex", flexDirection: "column", gap: 0, borderTop: "1px solid var(--line)", paddingTop: 4 },
+  groupPartRow: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 0", borderBottom: "1px solid rgba(45,53,67,0.4)", gap: 12 },
+  groupPartName: { fontSize: 12, color: "var(--muted)", fontFamily: "var(--mono)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
+  groupPartCost: { fontSize: 13, fontFamily: "var(--mono)", fontWeight: 600, color: "var(--accent)", flexShrink: 0 },
+  pageFoot: { marginTop: 24, fontSize: 12.5, color: "var(--muted)", textAlign: "center", lineHeight: 1.7 },
+};
+
+
+const container = document.getElementById('root');
+const root = ReactDOM.createRoot(container);
+root.render(React.createElement(BOMManager));
+</script>
+</body>
+</html>
