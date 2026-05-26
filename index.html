@@ -541,7 +541,7 @@ function BOMManager() {
                           <input className="cell-input" type="number" step="0.001" value={part.stockLength}
                             onChange={(e) => updatePart(part.id, "stockLength", e.target.value)} style={styles.detailInput} min="0" />
                         </DetailField>
-                        <DetailField label="Price / stick" unit="$">
+                        <DetailField label="Price / stick" unit="Rp">
                           <input className="cell-input" type="number" step="0.01" value={part.stockPrice}
                             onChange={(e) => updatePart(part.id, "stockPrice", e.target.value)} style={styles.detailInput} min="0" />
                         </DetailField>
